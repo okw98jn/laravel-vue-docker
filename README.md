@@ -18,4 +18,4 @@
 2. `make up` - Docker コンテナを起動
 3. `make npm-i` - npm パッケージをインストール
 4. `make npm-d` - npm run dev
-5. `laravel-install` - Laravel の依存関係をインストール
+5. `make laravel-install` - Laravel の依存関係をインストール
