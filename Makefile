@@ -15,11 +15,11 @@ build:
 	docker compose build --no-cache --force-rm
 
 # コンテナシェルログイン(laravel)
-sh-backend:
+sh-php:
 	docker compose exec backend bash
 
 # コンテナシェルログイン(vue)
-sh-frontend:
+sh-vue:
 	docker compose exec frontend bash
 
 # コンテナシェルログイン(mysql)
