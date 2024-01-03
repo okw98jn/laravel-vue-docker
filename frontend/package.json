@@ -4,7 +4,6 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "prepare": "panda codegen",
         "dev": "vite",
         "build": "run-p type-check \"build-only {@}\" --",
         "preview": "vite preview",
@@ -20,7 +19,6 @@
         "vue-router": "^4.2.5"
     },
     "devDependencies": {
-        "@pandacss/dev": "^0.23.0",
         "@tsconfig/node18": "^18.2.2",
         "@types/node": "^18.19.3",
         "@vitejs/plugin-vue": "^4.5.2",
