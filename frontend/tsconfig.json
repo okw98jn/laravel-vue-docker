@@ -1,4 +1,10 @@
 {
+  "compilerOptions": {
+    "strict": true,
+    "target": "ES2022",
+    "isolatedModules": true,
+    "esModuleInterop": true,
+  },
   "files": [],
   "references": [
     {
