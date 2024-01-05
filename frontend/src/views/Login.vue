@@ -4,6 +4,7 @@ import { useStore } from '@/store';
 import { useRouter } from 'vue-router';
 import type { UserLogin } from '@/types/User';
 import { ref, type Ref } from 'vue';
+import Header from '@/components/auth/Header.vue';
 
 const store = useStore();
 const router = useRouter();
@@ -30,19 +31,7 @@ const login = (e: Event): void => {
 </script>
 
 <template>
-	<div>
-		<img class="mx-auto h-12 w-auto" src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg"
-			alt="Workflow" />
-		<h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-			Sign in to your account
-		</h2>
-		<p class="mt-2 text-center text-sm text-gray-600">
-			新規登録は
-			<router-link :to="{ name: 'Register' }" class="font-medium text-indigo-600 hover:text-indigo-500">
-				こちら
-			</router-link>
-		</p>
-	</div>
+	<Header title="Sign in" sub-title="新規登録" route-name="Register" />
 	<form class="mt-8 space-y-6" @submit="login">
 		<div v-if="errorMsg" class="flex items-center justify-between py-2 px-5 bg-red-500 text-white rounded">
 			{{ errorMsg }}

@@ -3,7 +3,7 @@ import { useStore } from '@/store'
 import DefaultLayout from '@/components/DefaultLayout.vue'
 import Dashboard from '@/views/Dashboard.vue'
 import Surveys from '@/views/Surveys.vue'
-import AuthLayout from '@/components/AuthLayout.vue'
+import AuthLayout from '@/components/auth/AuthLayout.vue'
 import Login from '@/views/Login.vue'
 import Register from '@/views/Register.vue'
 

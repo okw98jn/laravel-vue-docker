@@ -3,6 +3,8 @@ import { LockClosedIcon } from '@heroicons/vue/24/solid'
 import { useStore } from '@/store';
 import { useRouter } from 'vue-router';
 import type { UserRegister } from '@/types/User';
+import Header from '@/components/auth/Header.vue';
+
 const store = useStore();
 const router = useRouter();
 
@@ -25,19 +27,7 @@ const register = (e: Event): void => {
 </script>
 
 <template>
-	<div>
-		<img class="mx-auto h-12 w-auto" src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg"
-			alt="Workflow" />
-		<h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-			Sign up to your account
-		</h2>
-		<p class="mt-2 text-center text-sm text-gray-600">
-			ログインは
-			<router-link :to="{ name: 'Login' }" class="font-medium text-indigo-600 hover:text-indigo-500">
-				こちら
-			</router-link>
-		</p>
-	</div>
+	<Header title="Sign up" sub-title="ログイン" route-name="Login" />
 	<form class="mt-8 space-y-6" @submit="register">
 		<input type="hidden" name="remember" value="true" />
 		<div class="rounded-md shadow-sm">
