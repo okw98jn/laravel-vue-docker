@@ -1,10 +1,11 @@
-import type { User } from "@/types/User";
+import type { User, UserLogin, UserRegister } from "@/types/User";
 import { defineStore } from "pinia"
+import axiosClient from "@/axios";
 
 type UserState = {
     user: {
         data: User;
-        token: number | null;
+        token: string | null;
     };
 };
 
@@ -13,23 +14,46 @@ export const useStore = defineStore({
     state: (): UserState => ({
         user: {
             data: {
-                name: 'Tom Cook',
-                email: 'tom@example.com',
-                imageUrl:
-                    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+                name: '',
+                email: '',
+                imageUrl: ''
             },
-            token: 1,
+            token: sessionStorage.getItem('TOKEN'),
         },
     }),
     getters: {},
     actions: {
+        register: (state: UserState, user: UserRegister) => {
+            return axiosClient.post('/register', user)
+                .then(({ data }) => {
+                    state.user.token = data.token;
+                    state.user.data = data.user;
+                    sessionStorage.setItem('TOKEN', data.token);
+                    return data;
+                })
+        },
+        login: (state: UserState, user: UserLogin) => {
+            return axiosClient.post('/login', user)
+                .then(({ data }) => {
+                    state.user.token = data.token;
+                    state.user.data = data.user;
+                    sessionStorage.setItem('TOKEN', data.token);
+                    return data;
+                })
+        },
         logout: (state: UserState) => {
-            state.user.data = {
-                name: '',
-                email: '',
-                imageUrl: ''
-            };
-            state.user.token = null;
+            return axiosClient.post('/logout')
+                .then(response => {
+                    state.user.data = {
+                        name: '',
+                        email: '',
+                        imageUrl: ''
+                    };
+                    state.user.token = null;
+                    sessionStorage.removeItem('TOKEN');
+                    return response;
+                })
+
         }
     },
 })

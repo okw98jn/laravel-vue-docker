@@ -16,8 +16,10 @@ const router = useRouter();
 const user: ComputedRef<User> = computed(() => store.user.data);
 
 const logout = (): void => {
-    store.logout(store);
-    router.push({ name: 'Login' });
+    store.logout(store)
+        .then(() => {
+            router.push({ name: 'Login' });
+        })
 };
 
 </script>
