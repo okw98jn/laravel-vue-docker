@@ -64,6 +64,10 @@ seed:
 fresh:
 	docker compose exec backend php artisan migrate:fresh
 
+# Pint
+Pint:
+	docker compose exec backend ./vendor/bin/pint
+
 # npm create vue@latest
 vue-install:
 	docker compose exec frontend npm create vue@latest .
