@@ -22,7 +22,7 @@ export type SurveyForm = {
 };
 
 export type Question = {
-    id: number;
+    id: number | string;
     type: string;
     question: string;
     description: string;
