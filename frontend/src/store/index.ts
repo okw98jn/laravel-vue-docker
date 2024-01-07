@@ -163,6 +163,7 @@ export const useStore = defineStore({
     getters: {},
     actions: {
         saveSurvey: (state: SurveyState, survey: SurveyForm) => {
+            delete survey.image_url;
             let response;
             if (survey.id) {
                 response = axiosClient

@@ -17,6 +17,7 @@ const model: Ref<SurveyForm> = ref({
 	title: '',
 	status: '',
 	image: '',
+	image_url: '',
 	description: '',
 	expire_date: '',
 	questions: []
@@ -27,9 +28,25 @@ if (route.params.id) {
 	const foundSurvey = store.surveys.find((survey) => survey.id === surveyId);
 
 	if (foundSurvey) {
-		model.value = foundSurvey;
+		model.value = {
+			...foundSurvey,
+			image_url: '',
+		};
 	}
 }
+
+const onImageChoose = (event: any): void => {
+	const file = event.target.files[0];
+
+	const reader = new FileReader();
+	reader.onload = () => {
+		if (typeof reader.result === 'string') {
+			model.value.image = reader.result;
+			model.value.image_url = reader.result;
+		}
+	};
+	reader.readAsDataURL(file);
+};
 
 const addQuestion = (index: number = 0): void => {
 	const newQuestion = {
@@ -86,7 +103,8 @@ const saveSurvey = (): void => {
 							画像
 						</label>
 						<div class="mt-1 flex items-center">
-							<img v-if="model.image" :src="model.image" :alt="model.title" class="w-64 h-48 object-cover">
+							<img v-if="model.image_url" :src="model.image_url" :alt="model.title"
+								class="w-64 h-48 object-cover">
 							<span v-else
 								class="flex items-center justify-center h-12 w-12 rounded-full overflow-hidden bg-gray-100">
 								<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20"
@@ -97,7 +115,8 @@ const saveSurvey = (): void => {
 							</span>
 							<button type="button"
 								class="relative overflow-hidden ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-								<input type="file" class="absolute left-0 top-0 right-0 button-0 opacity-0 cursor-pointer">
+								<input type="file" @change="onImageChoose"
+									class="absolute left-0 top-0 right-0 button-0 opacity-0 cursor-pointer">
 								変更
 							</button>
 						</div>

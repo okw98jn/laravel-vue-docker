@@ -16,6 +16,7 @@ export type SurveyForm = {
     title: string;
     status: string;
     image: string;
+    image_url?: string;
     description: string;
     expire_date: string;
     questions: Question[];
