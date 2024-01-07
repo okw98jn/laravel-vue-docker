@@ -30,6 +30,7 @@ class StoreSurveyRequest extends FormRequest
     {
         return [
             'title'       => 'required|string|max:255',
+            'image'       => 'nullable|string',
             'user_id'     => 'exists:users,id',
             'status'      => 'required|boolean',
             'description' => 'nullable|string|',
@@ -41,6 +42,7 @@ class StoreSurveyRequest extends FormRequest
     {
         return [
             'title'       => 'タイトル',
+            'image'       => '画像',
             'user_id'     => 'ユーザーID',
             'status'      => 'ステータス',
             'description' => '説明',
