@@ -15,7 +15,7 @@ class AuthController extends Controller
     }
 
     /**
-     * 新規ユーザーを登録し、トークンを生成します。
+     * 新規ユーザーを登録し、トークンを生成します
      *
      * @param  \App\Http\Requests\RegisterRequest  $request  バリデーション済みのリクエストデータ
      * @return \Illuminate\Http\Response  登録されたユーザー情報とトークンを含むレスポンス
@@ -34,11 +34,11 @@ class AuthController extends Controller
     }
 
     /**
-     * ユーザーのログインを処理します。
+     * ユーザーのログインを処理します
      *
-     * @param  LoginRequest  $request ログインリクエスト。バリデーション済みの認証情報と'remember'フィールドを含みます。
-     * @return \Illuminate\Http\Response ログイン成功時はユーザー情報とトークンを含むレスポンスを返します。
-     *                                  ログイン失敗時はエラーメッセージと422 Unprocessable Entityステータスを返します。
+     * @param  LoginRequest  $request ログインリクエスト。バリデーション済みの認証情報と'remember'フィールドを含みます
+     * @return \Illuminate\Http\Response ログイン成功時はユーザー情報とトークンを含むレスポンスを返します
+     *                                  ログイン失敗時はエラーメッセージと422 Unprocessable Entityステータスを返します
      */
     public function login(LoginRequest $request)
     {
@@ -62,9 +62,9 @@ class AuthController extends Controller
     }
 
     /**
-     * ユーザーのログアウトを処理します。
+     * ユーザーのログアウトを処理します
      *
-     * @return \Illuminate\Http\Response ログアウト成功時は、成功ステータスを含むレスポンスと共に200 OKステータスを返します。
+     * @return \Illuminate\Http\Response ログアウト成功時は、成功ステータスを含むレスポンスと共に200 OKステータスを返します
      */
     public function logout()
     {
