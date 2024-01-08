@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { v4 as uuidv4 } from 'uuid';
-import { PlusIcon } from '@heroicons/vue/24/solid'
+import { PlusIcon, TrashIcon } from '@heroicons/vue/24/solid'
 import PageLayout from '@/components/PageLayout.vue';
 import { useStore } from '@/store';
 import type { Question, SurveyForm } from '@/types/Survey';
-import { ref, type Ref } from 'vue';
+import { ref, watch, type Ref, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import QuestionEditor from '@/components/editor/QuestionEditor.vue';
 
 const store = useStore();
 const route = useRoute();
 const router = useRouter();
+const surveyLoading = computed(() => store.$state.currentSurvey.loading);
 
 const model: Ref<SurveyForm> = ref({
 	id: null,
@@ -23,16 +24,18 @@ const model: Ref<SurveyForm> = ref({
 	questions: []
 });
 
-if (route.params.id) {
-	const surveyId = Number(route.params.id);
-	const foundSurvey = store.surveys.find((survey) => survey.id === surveyId);
-
-	if (foundSurvey) {
+watch(
+	() => store.$state.currentSurvey.data,
+	(newVal, oldVal) => {
 		model.value = {
-			...foundSurvey,
-			image_url: '',
+			...JSON.parse(JSON.stringify(newVal)),
+			status: newVal.status !== 'draft',
 		};
 	}
+);
+
+if (route.params.id) {
+	store.getSurvey(store, Number(route.params.id));
 }
 
 const onImageChoose = (event: any): void => {
@@ -83,6 +86,17 @@ const saveSurvey = (): void => {
 			});
 		})
 }
+
+const deleteSurvey = (): void => {
+	if (confirm('本当に削除しますか？') && model.value.id) {
+		store.deleteSurvey(model.value.id)
+			.then(() => {
+				router.push({
+					name: 'Surveys',
+				});
+			})
+	}
+}
 </script>
 
 <template>
@@ -90,11 +104,18 @@ const saveSurvey = (): void => {
 		<template v-slot:header>
 			<div class="flex items-center justify-between">
 				<h1 class="text-3xl font-bold text-gray-900">
-					{{ model.id ? model.title : '新規登録' }}
+					{{ route.params.id ? model.title : '新規登録' }}
 				</h1>
+
+				<button v-if="route.params.id" type="button" @click="deleteSurvey()"
+					class="py-2 px-4 text-white bg-red-500 rounded-md hover:bg-red-600">
+					<TrashIcon class="h-5 w-5 -mt-1 inline-block" />
+					削除
+				</button>
 			</div>
 		</template>
-		<form @submit.prevent="saveSurvey">
+		<div v-if="surveyLoading" class="flex justify-center">Loading...</div>
+		<form v-else @submit.prevent="saveSurvey">
 			<div class="shadow sm:rounded-md sm:overflow-hidden">
 				<div class="px-4 py-5 bg-white space-y-6 sm:p-6">
 					<!-- image -->

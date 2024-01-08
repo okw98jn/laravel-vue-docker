@@ -1,22 +1,12 @@
-import type { User, UserLogin, UserRegister } from "@/types/User";
+import type { UserLogin, UserRegister } from "@/types/User";
 import { defineStore } from "pinia"
 import axiosClient from "@/axios";
 import type { Survey, SurveyForm } from "@/types/Survey";
-
-type UserState = {
-    user: {
-        data: User;
-        token: string | null;
-    };
-};
-
-type SurveyState = {
-    surveys: Survey[];
-};
+import type { CurrentSurveyState, SurveyState, UserState } from "./type";
 
 const tmpSurveys: Survey[] = [
     {
-        id: 100,
+        id: 1,
         title: "test1",
         slug: "test-1",
         status: "draft",
@@ -109,7 +99,7 @@ const tmpSurveys: Survey[] = [
         ]
     },
     {
-        id: 200,
+        id: 2,
         title: "test2",
         slug: "test-2",
         status: "active",
@@ -157,31 +147,54 @@ export const useStore = defineStore({
             },
             token: sessionStorage.getItem('TOKEN'),
         },
+        currentSurvey: {
+            loading: false,
+            data: {
+                id: 0,
+                title: '',
+                slug: '',
+                status: '',
+                image: '',
+                description: '',
+                created_at: '',
+                updated_at: '',
+                expire_date: '',
+                questions: []
+            },
+        },
         surveys: [...tmpSurveys],
         questionTypes: ["select", "checkbox", "radio", "text", "textarea"],
     }),
     getters: {},
     actions: {
-        saveSurvey: (state: SurveyState, survey: SurveyForm) => {
+        getSurvey: (state: CurrentSurveyState, id: number) => {
+            state.currentSurvey.loading = true;
+            return axiosClient.get(`/surveys/${id}`)
+                .then((res) => {
+                    state.currentSurvey.data = res.data.data;
+                    state.currentSurvey.loading = false;
+                    return res;
+                })
+                .catch((err) => {
+                    state.currentSurvey.loading = false;
+                    return err;
+                });
+        },
+        saveSurvey: (state: CurrentSurveyState, survey: SurveyForm) => {
             delete survey.image_url;
             let response;
             if (survey.id) {
                 response = axiosClient
                     .put(`/surveys/${survey.id}`, survey)
                     .then((res) => {
-                        state.surveys = state.surveys.map((s) => {
-                            if (s.id === survey.id) {
-                                return res.data;
-                            }
-                            return s;
-                        });
+                        state.currentSurvey.data = res.data.data;
                         return res;
                     });
             } else {
                 response = axiosClient
                     .post("/surveys", survey)
                     .then((res) => {
-                        state.surveys = [...state.surveys, res.data];
+                        state.currentSurvey.data = res.data.data;
                         return res;
                     });
             }
@@ -196,6 +209,9 @@ export const useStore = defineStore({
                     sessionStorage.setItem('TOKEN', data.token);
                     return data;
                 })
+        },
+        deleteSurvey: (id: number) => {
+            return axiosClient.delete(`/surveys/${id}`);
         },
         login: (state: UserState, user: UserLogin) => {
             return axiosClient.post('/login', user)
