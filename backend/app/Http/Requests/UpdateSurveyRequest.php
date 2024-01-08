@@ -11,7 +11,12 @@ class UpdateSurveyRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        $survey = $this->route('survey');
+        if ($this->user()->id !== $survey->user_id) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -22,7 +27,25 @@ class UpdateSurveyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'title'       => 'required|string|max:255',
+            'image'       => 'nullable|string',
+            'user_id'     => 'exists:users,id',
+            'status'      => 'required|boolean',
+            'description' => 'nullable|string|',
+            'expire_data' => 'nullable|date|after:tomorrow',
+            'questions'   => 'array',
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'title'       => 'タイトル',
+            'image'       => '画像',
+            'user_id'     => 'ユーザーID',
+            'status'      => 'ステータス',
+            'description' => '説明',
+            'expire_data' => '有効期限',
         ];
     }
 }

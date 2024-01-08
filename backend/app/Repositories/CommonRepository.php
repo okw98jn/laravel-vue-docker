@@ -31,6 +31,7 @@ class CommonRepository
     /**
      * 指定されたモデルインスタンスをデータベースから更新します
      *
+     * @param  Model  $modelInstance  更新するモデルインスタンス
      * @param  array  $data  モデルの更新に使用する属性の配列
      * $data = [
      *    'column1' => 'value1',
@@ -38,9 +39,9 @@ class CommonRepository
      * ];
      * @return bool  更新に成功した場合はtrue、失敗した場合はfalse
      */
-    public function update(array $data)
+    public function update(Model $modelInstance, array $data): bool
     {
-        return $this->model->update($data);
+        return $modelInstance->update($data);
     }
 
     /**
@@ -49,11 +50,9 @@ class CommonRepository
      * @param  int  $id  削除するモデルインスタンスのID
      * @return bool  削除に成功した場合はtrue、失敗した場合はfalse
      */
-    public function delete(int $id)
+    public function delete(int $id): bool
     {
-        $data = $this->model->find($id);
-
-        return $data->delete();
+        return $this->model->find($id)->delete();
     }
 
     /**
