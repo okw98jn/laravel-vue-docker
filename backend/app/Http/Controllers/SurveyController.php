@@ -131,7 +131,7 @@ class SurveyController extends Controller
             $image = substr($image, strpos($image, ',') + 1);
             $type = strtolower($type[1]);
 
-            if (!in_array($type, ['jpg', 'jpeg', 'gif', 'png'], true)) {
+            if (! in_array($type, ['jpg', 'jpeg', 'gif', 'png'], true)) {
                 throw new \Exception('画像の形式が不正です');
             }
             $image = str_replace(' ', '+', $image);
@@ -145,10 +145,10 @@ class SurveyController extends Controller
         }
 
         $dir = 'images/';
-        $file = Str::random() . '.' . $type;
+        $file = Str::random().'.'.$type;
         $absolutePath = public_path($dir);
-        $relativePath = $dir . $file;
-        if (!File::exists($absolutePath)) {
+        $relativePath = $dir.$file;
+        if (! File::exists($absolutePath)) {
             File::makeDirectory($absolutePath, 0755, true);
         }
         file_put_contents($relativePath, $image);
