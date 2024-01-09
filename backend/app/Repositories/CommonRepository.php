@@ -66,7 +66,7 @@ class CommonRepository
      * ];
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator ページネーションされたデータ
      */
-    public function getPaginatedByWhere(array $where)
+    public function getPaginatedByWhere(array ...$where)
     {
         return $this->model->where(...$where)->paginate();
     }
