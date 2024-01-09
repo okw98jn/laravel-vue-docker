@@ -16,5 +16,8 @@ export type CurrentSurveyState = {
 };
 
 export type SurveyState = {
-    surveys: Survey[];
+    surveys: {
+        loading: boolean;
+        data: Survey[];
+    };
 };

@@ -4,6 +4,7 @@ export type Survey = {
     slug: string;
     status: string;
     image: string;
+    image_url?: string;
     description: string;
     created_at: string;
     updated_at: string;
