@@ -61,12 +61,9 @@ class SurveyController extends Controller
      * @param  Request  $request リクエスト情報。ログインユーザー情報を含みます
      * @return SurveyResource 指定されたアンケート。SurveyResourceによりフォーマットされます
      */
-    public function show(Survey $survey, Request $request)
+    public function show(Survey $survey)
     {
-        $user = $request->user();
-        if ($survey->user_id !== $user->id) {
-            return abort(Response::HTTP_FORBIDDEN, '権限がありません');
-        }
+        $this->authorize('view', $survey);
 
         return new SurveyResource($survey);
     }
@@ -102,12 +99,9 @@ class SurveyController extends Controller
      * @param  Request  $request リクエスト情報。ログインユーザー情報を含みます
      * @return \Illuminate\Http\Response レスポンス
      */
-    public function destroy(Survey $survey, Request $request)
+    public function destroy(Survey $survey)
     {
-        $user = $request->user();
-        if ($survey->user_id !== $user->id) {
-            return abort(Response::HTTP_FORBIDDEN, '権限がありません');
-        }
+        $this->authorize('delete', $survey);
 
         $survey->delete();
 
@@ -131,7 +125,7 @@ class SurveyController extends Controller
             $image = substr($image, strpos($image, ',') + 1);
             $type = strtolower($type[1]);
 
-            if (!in_array($type, ['jpg', 'jpeg', 'gif', 'png'], true)) {
+            if (! in_array($type, ['jpg', 'jpeg', 'gif', 'png'], true)) {
                 throw new \Exception('画像の形式が不正です');
             }
             $image = str_replace(' ', '+', $image);
@@ -145,10 +139,10 @@ class SurveyController extends Controller
         }
 
         $dir = 'images/';
-        $file = Str::random() . '.' . $type;
+        $file = Str::random().'.'.$type;
         $absolutePath = public_path($dir);
-        $relativePath = $dir . $file;
-        if (!File::exists($absolutePath)) {
+        $relativePath = $dir.$file;
+        if (! File::exists($absolutePath)) {
             File::makeDirectory($absolutePath, 0755, true);
         }
         file_put_contents($relativePath, $image);
@@ -164,7 +158,7 @@ class SurveyController extends Controller
      */
     private function createQuestion(array $question): object
     {
-        if (!empty($question['data'])) {
+        if (! empty($question['data'])) {
             $question['data'] = json_encode($question['data']);
         }
 
@@ -179,7 +173,7 @@ class SurveyController extends Controller
                 SurveyConst::TYPE_CHECKBOX,
             ])],
             'description' => 'nullable|string',
-            'data'        => 'present'
+            'data'        => 'present',
         ]);
 
         return SurveyQuestion::create($validator->validated());
