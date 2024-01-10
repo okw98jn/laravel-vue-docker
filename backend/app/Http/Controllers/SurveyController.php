@@ -7,8 +7,7 @@ use App\Http\Requests\StoreSurveyRequest;
 use App\Http\Requests\UpdateSurveyRequest;
 use App\Http\Resources\SurveyResource;
 use App\Models\Survey;
-use App\Repositories\Survey\SurveyRepositoryInterface;
-use App\Repositories\SurveyQuestion\SurveyQuestionRepositoryInterface;
+use App\Models\SurveyQuestion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
@@ -18,12 +17,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SurveyController extends Controller
 {
-    public function __construct(
-        protected SurveyRepositoryInterface $surveyRepository,
-        protected SurveyQuestionRepositoryInterface $surveyQuestionRepository
-    ) {
-    }
-
     /**
      * ログインユーザーが作成したアンケート一覧を取得し、レスポンスとして返します
      *
@@ -33,11 +26,8 @@ class SurveyController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        $surveys = $this->surveyRepository->getPaginatedByWhere([
-            ['user_id', $user->id],
-        ]);
 
-        return SurveyResource::collection($surveys);
+        return SurveyResource::collection(Survey::where('user_id', $user->id)->orderBy('created_at', 'DESC')->paginate(10));
     }
 
     /**
@@ -54,7 +44,7 @@ class SurveyController extends Controller
             $data['image'] = $relativePath;
         }
 
-        $survey = $this->surveyRepository->create($data);
+        $survey = Survey::create($data);
 
         foreach ($data['questions'] as $question) {
             $question['survey_id'] = $survey->id;
@@ -100,7 +90,7 @@ class SurveyController extends Controller
                 File::delete($absolutePath);
             }
         }
-        $this->surveyRepository->update($survey, $data);
+        $survey->update($data);
 
         return new SurveyResource($survey);
     }
@@ -119,7 +109,7 @@ class SurveyController extends Controller
             return abort(Response::HTTP_FORBIDDEN, '権限がありません');
         }
 
-        $this->surveyRepository->delete($survey->id);
+        $survey->delete();
 
         if ($survey->image) {
             $absolutePath = public_path($survey->image);
@@ -192,6 +182,6 @@ class SurveyController extends Controller
             'data'        => 'present'
         ]);
 
-        return $this->surveyQuestionRepository->create($validator->validated());
+        return SurveyQuestion::create($validator->validated());
     }
 }

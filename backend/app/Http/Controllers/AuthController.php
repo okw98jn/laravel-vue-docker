@@ -4,16 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
-use App\Repositories\User\UserRepositoryInterface;
+use App\Models\User;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    public function __construct(protected UserRepositoryInterface $userRepository)
-    {
-    }
-
     /**
      * 新規ユーザーを登録し、トークンを生成します
      *
@@ -24,7 +20,7 @@ class AuthController extends Controller
     {
         $data = $request->validated();
         $data['password'] = bcrypt($data['password']);
-        $user = $this->userRepository->create($data);
+        $user = User::create($data);
         $token = $user->createToken('main')->plainTextToken;
 
         return response([
