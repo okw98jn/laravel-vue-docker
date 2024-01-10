@@ -2,20 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Const\SurveyConst;
 use App\Http\Requests\StoreSurveyRequest;
 use App\Http\Requests\UpdateSurveyRequest;
 use App\Http\Resources\SurveyResource;
 use App\Models\Survey;
 use App\Repositories\Survey\SurveyRepositoryInterface;
+use App\Repositories\SurveyQuestion\SurveyQuestionRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\Response;
 
 class SurveyController extends Controller
 {
     public function __construct(
-        protected SurveyRepositoryInterface $surveyRepository
+        protected SurveyRepositoryInterface $surveyRepository,
+        protected SurveyQuestionRepositoryInterface $surveyQuestionRepository
     ) {
     }
 
@@ -50,6 +55,11 @@ class SurveyController extends Controller
         }
 
         $survey = $this->surveyRepository->create($data);
+
+        foreach ($data['questions'] as $question) {
+            $question['survey_id'] = $survey->id;
+            $this->createQuestion($question);
+        }
 
         return new SurveyResource($survey);
     }
@@ -131,7 +141,7 @@ class SurveyController extends Controller
             $image = substr($image, strpos($image, ',') + 1);
             $type = strtolower($type[1]);
 
-            if (! in_array($type, ['jpg', 'jpeg', 'gif', 'png'], true)) {
+            if (!in_array($type, ['jpg', 'jpeg', 'gif', 'png'], true)) {
                 throw new \Exception('画像の形式が不正です');
             }
             $image = str_replace(' ', '+', $image);
@@ -145,14 +155,43 @@ class SurveyController extends Controller
         }
 
         $dir = 'images/';
-        $file = Str::random().'.'.$type;
+        $file = Str::random() . '.' . $type;
         $absolutePath = public_path($dir);
-        $relativePath = $dir.$file;
-        if (! File::exists($absolutePath)) {
+        $relativePath = $dir . $file;
+        if (!File::exists($absolutePath)) {
             File::makeDirectory($absolutePath, 0755, true);
         }
         file_put_contents($relativePath, $image);
 
         return $relativePath;
+    }
+
+    /**
+     * 指定された質問を作成します
+     *
+     * @param  array  $question 作成する質問
+     * @return object 作成された質問
+     */
+    private function createQuestion(array $question): object
+    {
+        if (!empty($question['data'])) {
+            $question['data'] = json_encode($question['data']);
+        }
+
+        $validator = Validator::make($question, [
+            'survey_id' => 'exists:App\Models\Survey,id',
+            'quesyion' => 'required|string',
+            'type'     => ['required', Rule::in([
+                SurveyConst::TYPE_TEXT,
+                SurveyConst::TYPE_TEXTAREA,
+                SurveyConst::TYPE_SELECT,
+                SurveyConst::TYPE_RADIO,
+                SurveyConst::TYPE_CHECKBOX,
+            ])],
+            'description' => 'nullable|string',
+            'data'        => 'present'
+        ]);
+
+        return $this->surveyQuestionRepository->create($validator->validated());
     }
 }

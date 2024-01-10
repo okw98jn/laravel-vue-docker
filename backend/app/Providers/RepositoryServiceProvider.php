@@ -15,6 +15,7 @@ class RepositoryServiceProvider extends ServiceProvider
     {
         $this->bindUserRepository();
         $this->bindSurveyRepository();
+        $this->bindSurveyQuestionRepository();
     }
 
     /**
@@ -40,6 +41,19 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             \App\Repositories\Survey\SurveyRepositoryInterface::class,
             \App\Repositories\Survey\SurveyRepository::class
+        );
+    }
+
+    /**
+     * SurveyQuestionリポジトリインターフェースとその実装をバインドします
+     *
+     * @return void
+     */
+    protected function bindSurveyQuestionRepository()
+    {
+        $this->app->bind(
+            \App\Repositories\SurveyQuestion\SurveyQuestionRepositoryInterface::class,
+            \App\Repositories\SurveyQuestion\SurveyQuestionRepository::class
         );
     }
 }

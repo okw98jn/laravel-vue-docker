@@ -35,6 +35,7 @@ class StoreSurveyRequest extends FormRequest
             'status'      => 'required|boolean',
             'description' => 'nullable|string|',
             'expire_data' => 'nullable|date|after:tomorrow',
+            'questions'   => 'array',
         ];
     }
 
@@ -47,6 +48,7 @@ class StoreSurveyRequest extends FormRequest
             'status'      => 'ステータス',
             'description' => '説明',
             'expire_data' => '有効期限',
+            'questions'   => '質問',
         ];
     }
 }
