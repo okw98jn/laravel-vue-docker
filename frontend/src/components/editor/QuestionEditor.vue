@@ -12,7 +12,7 @@ type Props = {
 const { question, index } = defineProps<Props>();
 
 const emit = defineEmits<{
-    change: [void],
+    change: [Question],
     addQuestion: [number],
     deleteQuestion: [Question],
 }>();
@@ -58,7 +58,7 @@ const typeChange = (): void => {
 }
 
 const dataChange = (): void => {
-    const data = JSON.parse(JSON.stringify(model.value.data));
+    const data = model.value;
     if (!shouldHaveOptions()) {
         delete data.data.options;
     }

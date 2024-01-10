@@ -9,6 +9,7 @@ use App\Http\Resources\SurveyResource;
 use App\Models\Survey;
 use App\Models\SurveyQuestion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -88,6 +89,26 @@ class SurveyController extends Controller
             }
         }
         $survey->update($data);
+        $existingIds = $survey->questions->pluck('id')->toArray();
+        $newIds = Arr::pluck($data['questions'], 'id');
+        $deleteIds = array_diff($existingIds, $newIds);
+        $addIds = array_diff($newIds, $existingIds);
+        SurveyQuestion::destroy($deleteIds);
+
+        foreach ($data['questions'] as $question) {
+            if (in_array($question['id'], $addIds)) {
+                $question['survey_id'] = $survey->id;
+                $this->createQuestion($question);
+            }
+        }
+
+        $questionMap = collect($data['questions'])->keyBy('id');
+
+        foreach ($survey->questions as $question) {
+            if (isset($questionMap[$question->id])) {
+                $this->updateQuestion($question, $questionMap[$question->id]);
+            }
+        }
 
         return new SurveyResource($survey);
     }
@@ -158,14 +179,14 @@ class SurveyController extends Controller
      */
     private function createQuestion(array $question): object
     {
-        if (! empty($question['data'])) {
+        if (is_array($question['data'])) {
             $question['data'] = json_encode($question['data']);
         }
 
         $validator = Validator::make($question, [
             'survey_id' => 'exists:App\Models\Survey,id',
-            'quesyion' => 'required|string',
-            'type'     => ['required', Rule::in([
+            'question'  => 'required|string',
+            'type'      => ['required', Rule::in([
                 SurveyConst::TYPE_TEXT,
                 SurveyConst::TYPE_TEXTAREA,
                 SurveyConst::TYPE_SELECT,
@@ -177,5 +198,35 @@ class SurveyController extends Controller
         ]);
 
         return SurveyQuestion::create($validator->validated());
+    }
+
+    /**
+     * 指定された質問を更新します
+     *
+     * @param  object  $question 更新する質問
+     * @param  array  $data 更新する質問のデータ
+     * @return object 更新された質問
+     */
+    private function updateQuestion(SurveyQuestion $question, $data)
+    {
+        if (is_array($data['data'])) {
+            $data['data'] = json_encode($data['data']);
+        }
+
+        $validator = Validator::make($data, [
+            'id'       => 'exists:App\Models\SurveyQuestion,id',
+            'question' => 'required|string',
+            'type'     => ['required', Rule::in([
+                SurveyConst::TYPE_TEXT,
+                SurveyConst::TYPE_TEXTAREA,
+                SurveyConst::TYPE_SELECT,
+                SurveyConst::TYPE_RADIO,
+                SurveyConst::TYPE_CHECKBOX,
+            ])],
+            'description' => 'nullable|string',
+            'data'        => 'present',
+        ]);
+
+        return $question->update($validator->validated());
     }
 }
